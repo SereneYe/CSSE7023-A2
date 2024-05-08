@@ -55,12 +55,12 @@ public class TextUI extends UI {
     private String renderRow(int row, String[] values) {
         StringJoiner renderedRow = new StringJoiner(" | ");
         String rowHeader = row == -1 ? "" : "" + (row + 1);
-        int headerPadding = (view.getRows() / 10) - rowHeader.length();
+        int headerPadding = Math.max(0, (view.getRows() / 10) - rowHeader.length());
         renderedRow.add(rowHeader + " ".repeat(headerPadding));
         for (int column = 0; column < view.getColumns(); column++) {
             int maxWidth = maxWidth(column);
             String cellValue = values[column];
-            int padding = maxWidth - cellValue.length();
+            int padding = Math.max(0, maxWidth - cellValue.length());
             renderedRow.add(cellValue + " ".repeat(padding));
         }
         renderedRow.add("");

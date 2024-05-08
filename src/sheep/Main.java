@@ -12,6 +12,7 @@ import sheep.sheets.SheetBuilder;
 import sheep.ui.UI;
 import sheep.ui.graphical.javafx.JFXUI;
 import sheep.ui.graphical.swing.GUI;
+import sheep.ui.textual.TextUI;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,15 +51,16 @@ public class Main {
         run(uiType, builder, defaultSheet(builder));
     }
 
-    private static UI selectUI(String uiType, Sheet sheet) {
+    private static UI selectUI(String uiType, Sheet sheet, SheetBuilder builder) {
         return switch (uiType.toUpperCase()) {
             case "LEGACY", "OLD", "SWIFT" -> new GUI(sheet, sheet);
+            case "TEXT" -> new TextUI(sheet, sheet, builder);
             default -> new JFXUI(sheet, sheet);
         };
     }
 
     private static void run(String uiType, SheetBuilder builder, Sheet sheet) {
-        UI ui = selectUI(uiType, sheet);
+        UI ui = selectUI(uiType, sheet, builder);
 
         ui.addFeature("File", "save", "Save As...", (row, column, prompt, view, updater) -> {
             String filepath = prompt.saveFile();
