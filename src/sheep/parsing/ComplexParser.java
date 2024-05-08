@@ -8,6 +8,7 @@ import sheep.expression.ExpressionFactory;
  * @stage1
  */
 public class ComplexParser implements Parser {
+    Parser parser;
 
     /**
      * Construct a new parser.
@@ -16,7 +17,7 @@ public class ComplexParser implements Parser {
      * @param factory Factory used to construct parsed expressions.
      */
     public ComplexParser(ExpressionFactory factory){
-
+        parser = new SimpleParser(factory);
     }
 
     /**
@@ -62,6 +63,6 @@ public class ComplexParser implements Parser {
      */
     @Override
     public Expression parse(String input) throws ParseException {
-        return null;
+        return parser.parse(input);
     }
 }
