@@ -119,6 +119,7 @@ public class ComplexScanner {
      * A class that helps build a list of Tokens while ignoring whitespace and empty tokens.
      */
     private static class TokenBuilder {
+
         private final StringBuilder builder = new StringBuilder();
         private final List<Token> list = new ArrayList<>();
 
@@ -127,13 +128,16 @@ public class ComplexScanner {
          * <p>
          * Strings with parentheses are tokenized as FUNCs
          * Any string before the open parenthesis is treated as the name,
-         * Any string between the open parenthesis and it's matching close parenthesis is treated as the contents.
+         * Any string between the open parenthesis and it's matching
+         * close parenthesis is treated as the contents.
          * </p>
          * <p>
-         * Characters in the list of valid operators are tokenized alone as OPs with the character as the name.
+         * Characters in the list of valid operators are tokenized alone
+         * as OPs with the character as the name.
          * </p>
          * <p>
-         * Strings that can be parsed as a Long are tokenized as CONSTs with a name equal to the string.
+         * Strings that can be parsed as a Long are tokenized as CONSTs
+         * with a name equal to the string.
          * </p>
          * <p>
          * All other strings are treated as REFERENCEs with name equal to the whole string.

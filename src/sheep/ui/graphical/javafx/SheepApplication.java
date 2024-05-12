@@ -48,8 +48,8 @@ public class SheepApplication extends Application {
 
         stage.setTitle(TITLE);
 
-        SheepView sheepView = new SheepView(view);
-        new SheepController(sheepView);
+        SheepView sheepView = new SheepView(view, updater);
+
         stage.setScene(sheepView.getScene());
 
         stage.show();

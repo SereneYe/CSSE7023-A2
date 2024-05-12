@@ -5,10 +5,14 @@ import sheep.core.ViewElement;
 public class CellData {
     private ViewElement value;
     private ViewElement formula;
+    private int rowIndex;
+    private int columnIndex;
 
-    public CellData(ViewElement value, ViewElement formula) {
+    public CellData(ViewElement value, ViewElement formula, int rowIndex, int columnIndex) {
         this.value = value;
         this.formula = formula;
+        this.rowIndex = rowIndex;
+        this.columnIndex = columnIndex;
     }
 
     public ViewElement getValue() {
@@ -25,5 +29,13 @@ public class CellData {
 
     public void setFormula(ViewElement newFormula) {
         this.formula = newFormula;
+    }
+
+    public int getColumnIndex() {
+        return columnIndex;
+    }
+
+    public int getRowIndex() {
+        return rowIndex;
     }
 }

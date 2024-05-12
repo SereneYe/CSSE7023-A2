@@ -188,7 +188,9 @@ public abstract class Operation extends Expression {
      * sub-expressions.
      * <pre>
      * {@code
-     * Operator plus = Operator.plus(new Expression[]{Operator.minus(new Expression[]{new Reference("A1"), new Reference("A2")}), new Reference("B1")});
+     * Operator plus = Operator.plus(new Expression[]
+     * {Operator.minus(new Expression[]{new Reference("A1"),
+     * new Reference("A2")}), new Reference("B1")});
      * plus.dependencies() // {"A1", "A2", "B1"}
      * }</pre>
      *

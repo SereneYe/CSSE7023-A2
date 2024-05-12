@@ -87,8 +87,7 @@ public class SheetBuilder {
     /**
      * Construct a new empty sheet with the given number of rows and columns.
      * <p>
-     * If the built-ins are updated
-     * (i.e. {@link SheetBuilder#includeBuiltIn(String, Expression)} is called)
+     * If the built-ins are updated (i.e. {@link SheetBuilder#includeBuiltIn(String, Expression)} is called)
      * after a sheet has been constructed,
      * this must not affect the constructed sheet.
      *

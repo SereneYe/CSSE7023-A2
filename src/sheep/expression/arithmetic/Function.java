@@ -23,7 +23,8 @@ public abstract class Function extends Operation {
     }
 
     /**
-     * The string representation of the expression. For Functions this is the function's identifier followed by
+     * The string representation of the expression.
+     * For Functions this is the function's identifier followed by
      * sequence of sub-expressions joined by commas "," enclosed in Parentheses "()"
      * <pre>
      * {@code

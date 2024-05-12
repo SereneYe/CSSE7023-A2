@@ -104,7 +104,8 @@ public class Reference extends Expression {
      * <p>
      * If the given state does not have an entry for this reference's identifier,
      * return {@code this}.
-     * Otherwise, return the result of calling {@link Expression#value(Map)} on the entry in the state.
+     * Otherwise, return the result of calling {@link Expression#value(Map)}
+     * on the entry in the state.
      *
      * @param state A mapping of references to the expression they hold.
      * @return The result of evaluating this expression.
