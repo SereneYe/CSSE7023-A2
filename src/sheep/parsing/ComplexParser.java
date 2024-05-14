@@ -61,7 +61,6 @@ public class ComplexParser implements Parser {
                 return factory.createReference(token.name());
             }
         } else if (tokens.size() % 2 == 1) {
-
             char operator = OPERATORS.get(cur_precedence);
             List<Integer> operatorIndices = new ArrayList<>();
             for (int i = 1; i < tokens.size(); i += 2) {
@@ -89,7 +88,6 @@ public class ComplexParser implements Parser {
             throw new ParseException("Invalid expression: Inconsistency between operators and " +
                     "numbers of tokens");
         }
-
         return factory.createEmpty();
     }
 

@@ -10,12 +10,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import sheep.core.SheetUpdate;
 import sheep.core.SheetView;
 import sheep.core.UpdateResponse;
 import sheep.core.ViewElement;
 import sheep.ui.graphical.Configuration;
 
+import java.io.File;
 import java.util.Objects;
 
 public class SheepView {
@@ -40,6 +42,8 @@ public class SheepView {
      */
     private Label formulaLabel;
 
+    private MenuBar menuBar;
+
 
     /**
      * Creates a SheepView object.
@@ -54,6 +58,66 @@ public class SheepView {
         this.view = view;
         this.sheetUpdate = sheetUpdate;
         sheetTableView = createTableView();
+        MenuItem openMenu = createOpenMenu();
+        MenuItem saveMenu = createSaveMenu();
+
+        Menu fileMenu = new Menu("File");
+        fileMenu.getItems().addAll(openMenu, saveMenu);
+
+        // Create a MenuBar and add the File menu
+        menuBar = new MenuBar();
+        menuBar.getMenus().add(fileMenu);
+    }
+
+    MenuItem createOpenMenu() {
+        MenuItem menuItem = new MenuItem("Open");
+        menuItem.setOnAction(e -> {
+            openSpreadsheet();
+        });
+        return menuItem;
+    }
+
+    MenuItem createSaveMenu() {
+        MenuItem menuItem = new MenuItem("Save As");
+        menuItem.setOnAction(e -> {
+            saveAs();
+        });
+
+        return menuItem;
+    }
+
+    private void openSpreadsheet() {
+        FileChooser fileChooser = new FileChooser();
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Sheep files", "*.sheep");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Show open file dialog
+        File file = fileChooser.showOpenDialog(null);
+
+        if (file != null) {
+            // TODO Open your spreadsheet file here
+            // The actual implementation depends on your code structure
+        }
+    }
+
+    private void saveAs() {
+        FileChooser fileChooser = new FileChooser();
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Sheep files", "*.sheep");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Show save file dialog
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            // TODO Save your spreadsheet file here
+            // The actual implementation depends on your code structure
+        }
     }
 
     /**
@@ -74,10 +138,12 @@ public class SheepView {
      */
     public Scene getScene() {
         formulaLabel = new Label("");
-        formulaLabel.setPrefHeight(Configuration.ROW_HEIGHT);
+        formulaLabel.setPrefHeight(Configuration.ROW_HEIGHT+5);
         formulaLabel.setAlignment(Pos.CENTER);
+
+
         BorderPane pane = new BorderPane();
-        pane.setTop(formulaLabel);
+        pane.setTop(formulaLabel); // Set the VBox as the top
         pane.setCenter(sheetTableView);
         return new Scene(pane);
     }
@@ -338,11 +404,14 @@ public class SheepView {
 
             CellData cellData = getCellData();
 
-            // Change this part to render value instead of formula
-            ViewElement value = cellData.getValue();
-            String valueContent = value != null ? value.getContent() : "";
-            setText(valueContent);
-
+            if (cellData != null) {
+                // Change this part to render value instead of formula
+                ViewElement value = cellData.getValue();
+                String valueContent = value != null ? value.getContent() : "";
+                setText(valueContent);
+            } else {
+                setText("");
+            }
             setGraphic(null);
         }
 
@@ -383,9 +452,14 @@ public class SheepView {
         }
 
         private CellData getCellData() {
-            int rowIndex = getIndex();
-            CellData[] row = getTableView().getItems().get(rowIndex);
-            return row[columnIndex];
+            try {
+                int rowIndex = getIndex();
+                CellData[] row = getTableView().getItems().get(rowIndex);
+                return row[columnIndex];
+            } catch (IndexOutOfBoundsException e) {
+//                System.out.println("Caught an exception: " + e.getMessage());
+            }
+            return null;
         }
 
         private void refreshView() {
