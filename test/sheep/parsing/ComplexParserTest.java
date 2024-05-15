@@ -83,7 +83,7 @@ public class ComplexParserTest {
 
     @Test
     public void testConstantNegativeSpace() throws ParseException {
-        Expression expression = parser.parse("   -42");
+        Expression expression = parser.parse("   -A2");
         assertEquals("Parsing a negative constant with whitespace did not return result of createConstant(long).",
                 "(Constant: -42)", expression.toString());
     }
