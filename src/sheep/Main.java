@@ -1,5 +1,6 @@
 package sheep;
 
+import javafx.scene.control.Alert;
 import sheep.expression.CoreFactory;
 import sheep.expression.ExpressionFactory;
 import sheep.fun.Fibonacci;
@@ -32,8 +33,9 @@ public class Main {
             new Pascal(4, 2).draw(sheet);
             return sheet;
         } catch (FunException e) {
-            throw new RuntimeException(e);
+            showError(e);
         }
+        return null;
     }
 
     /**
@@ -70,7 +72,7 @@ public class Main {
             try (FileWriter writer = new FileWriter(filepath)) {
                 writer.write(view.encode());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                showError(e);
             }
         });
         ui.addFeature("File", "open", "Open...", (row, column, prompt, view, updater) -> {
@@ -82,15 +84,23 @@ public class Main {
                 Sheet newSheet = builder.load(filepath);
                 ui.openWindow(newSheet, newSheet);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                showError(e);
             }
         });
 
         try {
             ui.render();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            showError(e);
         }
+    }
+
+    private static void showError(Exception e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR); // Changed to ERROR
+        alert.setTitle("Error");
+        alert.setHeaderText("Cannot open the sheet. Please try again.");
+        alert.setContentText(e.getMessage());
+        alert.show();
     }
 
     /**

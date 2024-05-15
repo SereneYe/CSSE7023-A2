@@ -88,6 +88,7 @@ public class ComplexParser implements Parser {
             throw new ParseException("Invalid expression: Inconsistency between operators and " +
                     "numbers of tokens");
         }
+
         return factory.createEmpty();
     }
 

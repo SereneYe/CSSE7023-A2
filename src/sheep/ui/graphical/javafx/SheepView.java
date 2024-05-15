@@ -10,14 +10,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
 import sheep.core.SheetUpdate;
 import sheep.core.SheetView;
 import sheep.core.UpdateResponse;
 import sheep.core.ViewElement;
 import sheep.ui.graphical.Configuration;
 
-import java.io.File;
+
 import java.util.Objects;
 
 public class SheepView {
@@ -42,8 +41,6 @@ public class SheepView {
      */
     private Label formulaLabel;
 
-    private MenuBar menuBar;
-
 
     /**
      * Creates a SheepView object.
@@ -58,67 +55,8 @@ public class SheepView {
         this.view = view;
         this.sheetUpdate = sheetUpdate;
         sheetTableView = createTableView();
-        MenuItem openMenu = createOpenMenu();
-        MenuItem saveMenu = createSaveMenu();
-
-        Menu fileMenu = new Menu("File");
-        fileMenu.getItems().addAll(openMenu, saveMenu);
-
-        // Create a MenuBar and add the File menu
-        menuBar = new MenuBar();
-        menuBar.getMenus().add(fileMenu);
     }
 
-    MenuItem createOpenMenu() {
-        MenuItem menuItem = new MenuItem("Open");
-        menuItem.setOnAction(e -> {
-            openSpreadsheet();
-        });
-        return menuItem;
-    }
-
-    MenuItem createSaveMenu() {
-        MenuItem menuItem = new MenuItem("Save As");
-        menuItem.setOnAction(e -> {
-            saveAs();
-        });
-
-        return menuItem;
-    }
-
-    private void openSpreadsheet() {
-        FileChooser fileChooser = new FileChooser();
-
-        // Set extension filter
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Sheep files", "*.sheep");
-        fileChooser.getExtensionFilters().add(extFilter);
-
-        // Show open file dialog
-        File file = fileChooser.showOpenDialog(null);
-
-        if (file != null) {
-            // TODO Open your spreadsheet file here
-            // The actual implementation depends on your code structure
-        }
-    }
-
-    private void saveAs() {
-        FileChooser fileChooser = new FileChooser();
-
-        // Set extension filter
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Sheep files", "*.sheep");
-        fileChooser.getExtensionFilters().add(extFilter);
-
-        // Show save file dialog
-        File file = fileChooser.showSaveDialog(null);
-
-        if (file != null) {
-            // TODO Save your spreadsheet file here
-            // The actual implementation depends on your code structure
-        }
-    }
 
     /**
      * Returns the TableView object associated with the SheepView class.
@@ -419,12 +357,10 @@ public class SheepView {
         public void commitEdit(String newValue) {
             super.commitEdit(newValue);
 
-            // Get focus lost listener and remove it
             if (focusLostListener != null) {
                 textField.focusedProperty().removeListener(focusLostListener);
             }
 
-            // Apply the changes
             CellData cellData = getCellData();
 
             System.out.println("New value: " + newValue);
@@ -440,7 +376,7 @@ public class SheepView {
                 formulaLabel.setText(Objects.requireNonNullElse(newValue, ""));
             } else {
                 // If update failed, handle the error
-
+                showAlert("Update Failed", "Invalidate formula: " + response.getMessage());
             }
 
             // Remove focus from the TextField
@@ -477,5 +413,14 @@ public class SheepView {
             }
             sheetTableView.refresh();
         }
+    }
+
+    private void showAlert(String updateFailed, String failMessage) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(updateFailed);
+        alert.setHeaderText(null);
+        alert.setContentText(failMessage);
+
+        Platform.runLater(alert::showAndWait);
     }
 }

@@ -1,28 +1,18 @@
 package sheep.ui.graphical.javafx;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sheep.core.SheetUpdate;
 import sheep.core.SheetView;
-import sheep.expression.TypeError;
-import sheep.parsing.ParseException;
-import sheep.sheets.Sheet;
-import sheep.sheets.SheetBuilder;
 import sheep.ui.UI;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Map;
-
 import static sheep.ui.graphical.Configuration.TITLE;
 
 /**
@@ -33,10 +23,8 @@ import static sheep.ui.graphical.Configuration.TITLE;
 public class SheepApplication extends Application {
     private SheetView view;
     private SheetUpdate updater;
-    private Sheet sheet;
-    private SheetBuilder sheetBuilder;
-    private JFXUI ui;
-    private final Map<String, Map<String, UI.Feature>> features;
+    private JFXPrompt prompt;
+    private final Map<String, Map<String, JFXUI.Feature>> features;
 
 
     /**
@@ -53,70 +41,17 @@ public class SheepApplication extends Application {
         this.view = view;
         this.updater = updater;
         this.features = features;
-        this.ui = new JFXUI(view, updater);
     }
 
-    private MenuItem createOpenMenu() {
-        MenuItem menuItem = new MenuItem("Open");
+    private MenuItem createMenuItem(String function, String category) {
+        MenuItem menuItem = new MenuItem(function);
         menuItem.setOnAction(e -> {
-            try {
-                openSpreadsheet();
-            } catch (FileNotFoundException |TypeError |ParseException ex) {
-                throw new RuntimeException(ex);
+            UI.Feature feature = features.get(category).get(function);
+            if (feature != null) {
+                feature.action().perform(0, 0, prompt, view, updater);
             }
         });
         return menuItem;
-    }
-
-    private MenuItem createSaveMenu() {
-        MenuItem menuItem = new MenuItem("Save As");
-        menuItem.setOnAction(e -> {
-            saveAs();
-        });
-
-        return menuItem;
-    }
-
-    private void openSpreadsheet() throws FileNotFoundException, TypeError, ParseException {
-        FileChooser fileChooser = new FileChooser();
-
-        // Set extension filter
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Sheep files", "*.sheep");
-        fileChooser.getExtensionFilters().add(extFilter);
-
-        // Show open file dialog
-        File file = fileChooser.showOpenDialog(null);
-
-        if (file != null) {
-            try {
-                this.sheet = sheetBuilder.load(file.getAbsolutePath());
-            } catch (FileNotFoundException | ParseException | TypeError e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void saveAs() {
-        FileChooser fileChooser = new FileChooser();
-
-        // Set extension filter
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Sheep files", "*.sheep");
-        fileChooser.getExtensionFilters().add(extFilter);
-
-        // Show save file dialog
-        File file = fileChooser.showSaveDialog(null);
-
-        if (file != null) {
-            try {
-                String data = this.sheet.encode();
-                Files.writeString(file.toPath(), data);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 
@@ -131,21 +66,19 @@ public class SheepApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         // This is the main entry point for your javafx code.
+        prompt = new JFXPrompt(stage);
         stage.setTitle(TITLE);
 
         SheepView sheepView = new SheepView(view, updater);
 
         // Your existing methods to create MenuItems, assuming they are public
-        MenuItem openMenu = createOpenMenu();
-        MenuItem saveMenu = createSaveMenu();
+        MenuItem openMenu = createMenuItem("open", "File");
+        MenuItem saveMenu = createMenuItem("save", "File");
 
         Menu fileMenu = new Menu("File");
         fileMenu.getItems().addAll(openMenu, saveMenu);
 
-        MenuBar menuBar ;
-
-        // Create a MenuBar and add the File menu
-        menuBar = new MenuBar();
+        MenuBar menuBar  = new MenuBar();
         menuBar.getMenus().add(fileMenu);
 
         VBox topContainer = new VBox();
@@ -167,6 +100,21 @@ public class SheepApplication extends Application {
      * @param updater an updater for the new sheet.
      */
     public void createWindow(SheetView view, SheetUpdate updater) {
+        try {
+            // Create a new sheep application with the new view and updater
+            SheepApplication newWindowApp = new SheepApplication(view, updater, features);
 
+            // Start a new JavaFX application thread
+            Platform.runLater(() -> {
+                try {
+                    Stage newStage = new Stage();
+                    newWindowApp.start(newStage);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
