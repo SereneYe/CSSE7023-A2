@@ -80,6 +80,8 @@ public class SheepApplication extends Application {
 
         MenuBar menuBar  = new MenuBar();
         menuBar.getMenus().add(fileMenu);
+        Platform.runLater(()->{if (System.getProperty("os.name").startsWith("Mac"))
+        menuBar.useSystemMenuBarProperty().set(true);});
 
         VBox topContainer = new VBox();
         topContainer.getChildren().addAll(menuBar, sheepView.getScene().getRoot());

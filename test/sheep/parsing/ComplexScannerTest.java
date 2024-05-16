@@ -13,31 +13,61 @@ public class ComplexScannerTest {
         // Setup any common test data
     }
 
+    public void assertToken(ComplexScanner.Token token, ComplexScanner.TokenType expectedType, String expectedName, String expectedContent){
+        assertEquals(expectedType, token.type());
+        assertEquals(expectedName, token.name());
+        assertEquals(expectedContent, token.contents());
+    }
     ///////////////////////////////////////////////////
     // Tokenize Tests
     ///////////////////////////////////////////////////
     @Test
-    public void testTokenize() throws ParseException {
+    public void testTokenizeNormal1() throws ParseException {
         String input = "3 * (4 + 2)";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(3, tokens.size());
-
-        assertEquals(ComplexScanner.TokenType.CONST, tokens.get(0).type());
-        assertEquals("3", tokens.get(0).name());
-
-        assertEquals(ComplexScanner.TokenType.OP, tokens.get(1).type());
-        assertEquals("*", tokens.get(1).name());
-
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(2).type());
-        assertEquals("", tokens.get(2).name());
-        assertEquals("4+2", tokens.get(2).contents());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.CONST, "3", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, "*", null);
+        assertToken(tokens.get(2), ComplexScanner.TokenType.FUNC, "", "4+2");
     }
 
-    @Test(expected = ParseException.class)
-    public void testTokenizeUnmatchedParenthesis() throws ParseException {
-        String input = "(3 * (4 + 2))";
-        ComplexScanner.tokenize(input);
-        fail("Should have thrown ParseException");
+    @Test
+    public void testTokenizeNormal2() throws ParseException {
+        String input = "3 * 4 + 2";
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        assertEquals(5, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.CONST, "3", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, "*", null);
+        assertToken(tokens.get(2), ComplexScanner.TokenType.CONST, "4", null);
+        assertToken(tokens.get(3), ComplexScanner.TokenType.OP, "+", null);
+        assertToken(tokens.get(4), ComplexScanner.TokenType.CONST, "2", null);
+    }
+
+    @Test
+    public void testTokenizeNormal3() throws ParseException {
+        String input = "3 / 4 / 0";
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        assertEquals(5, tokens.size());
+
+        assertToken(tokens.get(0), ComplexScanner.TokenType.CONST, "3", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, "/", null);
+        assertToken(tokens.get(2), ComplexScanner.TokenType.CONST, "4", null);
+        assertToken(tokens.get(3), ComplexScanner.TokenType.OP, "/", null);
+        assertToken(tokens.get(4), ComplexScanner.TokenType.CONST, "0", null);
+    }
+
+    @Test
+    public void testTokenizeNormal4() throws ParseException {
+        String input = "3 ,   4 ,   0,";
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        assertEquals(6, tokens.size());
+
+        assertToken(tokens.get(0), ComplexScanner.TokenType.CONST, "3", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, ",", null);
+        assertToken(tokens.get(2), ComplexScanner.TokenType.CONST, "4", null);
+        assertToken(tokens.get(3), ComplexScanner.TokenType.OP, ",", null);
+        assertToken(tokens.get(4), ComplexScanner.TokenType.CONST, "0", null);
+        assertToken(tokens.get(5), ComplexScanner.TokenType.OP, ",", null);
     }
 
     @Test
@@ -45,17 +75,15 @@ public class ComplexScannerTest {
         String input = "+";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(1, tokens.size());
-        assertEquals(ComplexScanner.TokenType.OP, tokens.get(0).type());
-        assertEquals("+", tokens.get(0).name());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.OP, "+", null);
     }
 
     @Test
     public void testTokenizeConstant() throws ParseException {
-        String input = "42";
+        String input = "    42    ";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(1, tokens.size());
-        assertEquals(ComplexScanner.TokenType.CONST, tokens.get(0).type());
-        assertEquals("42", tokens.get(0).name());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.CONST, "42", null);
     }
 
     @Test
@@ -63,8 +91,8 @@ public class ComplexScannerTest {
         String input = "A2";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(1, tokens.size());
-        assertEquals(ComplexScanner.TokenType.REFERENCE, tokens.get(0).type());
-        assertEquals("A2", tokens.get(0).name());
+        assertToken(tokens.get(0),ComplexScanner.TokenType.REFERENCE,"A2",null);
+
     }
 
     @Test
@@ -72,15 +100,21 @@ public class ComplexScannerTest {
         String input = "MEAN(2 , 3)";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(1, tokens.size());
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(0).type());
-        assertEquals("MEAN", tokens.get(0).name());
-        assertEquals("2,3", tokens.get(0).contents());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "MEAN", "2,3");
     }
 
     @Test(expected = ParseException.class)
     public void testTokenizeUnmatchedOpenParenthesis() throws ParseException {
         String input = "(3 * (4 + 2";
         ComplexScanner.tokenize(input);
+        fail("Should have thrown ParseException");
+    }
+
+    @Test(expected = ParseException.class)
+    public void testTokenizeUnmatchedParenthesis() throws ParseException {
+        String input = "(3 * (4 + 2)";
+        ComplexScanner.tokenize(input);
+        fail("Should have thrown ParseException");
     }
 
     @Test(expected = ParseException.class)
@@ -91,7 +125,7 @@ public class ComplexScannerTest {
 
     @Test
     public void testTokenizeEmptyString() throws ParseException {
-        String input = " ";
+        String input = "";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(0, tokens.size());
     }
@@ -109,49 +143,54 @@ public class ComplexScannerTest {
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(3, tokens.size());
 
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(0).type());
-        assertEquals("", tokens.get(0).name());
-        assertEquals("5", tokens.get(0).contents());
-
-        assertEquals(ComplexScanner.TokenType.OP, tokens.get(1).type());
-        assertEquals("+", tokens.get(1).name());
-
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(2).type());
-        assertEquals("MEAN", tokens.get(2).name());
-        assertEquals("a,b", tokens.get(2).contents());
-
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "", "5");
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, "+", null);
+        assertToken(tokens.get(2), ComplexScanner.TokenType.FUNC, "MEAN", "a,b");
     }
 
     @Test
     public void testTokenizeMoreComplexExpression() throws ParseException {
-        String input = "fun1(fun2(10 - A3) / 4) * MEAN(5, A2, C2) + 3";
-//        String input = "5, A2, C2";
+        String input = "fun1(fun2(10 - A3) / 4)";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
-        assertEquals(5, tokens.size());
-
+        assertEquals(1, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "fun1", "fun2(10-A3)/4");
     }
 
     @Test
     public void testTokenizeUnmatchedOpenParenthesisInFunction() throws ParseException {
-//        String input = "MEAN((2 + 3), 4)";
         String input = "3,2+5,8";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
-        System.out.println(tokens);
+        assertEquals(7, tokens.size());
+
+        assertToken(tokens.get(0), ComplexScanner.TokenType.CONST, "3", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, ",", null);
+        assertToken(tokens.get(2), ComplexScanner.TokenType.CONST, "2", null);
+        assertToken(tokens.get(3), ComplexScanner.TokenType.OP, "+", null);
+        assertToken(tokens.get(4), ComplexScanner.TokenType.CONST, "5", null);
+        assertToken(tokens.get(5), ComplexScanner.TokenType.OP, ",", null);
+        assertToken(tokens.get(6), ComplexScanner.TokenType.CONST, "8", null);
     }
 
     @Test(expected = ParseException.class)
     public void testTokenizeUnmatchedCloseParenthesisInFunction() throws ParseException {
-        String input = "MEAN(2 + 3))";
+        String input = ")";
         ComplexScanner.tokenize(input);
+    }
+
+    @Test
+    public void testTokenizeSpecialCharacter() throws ParseException {
+        String input = "&";
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        assertEquals(1, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.REFERENCE, "&", null);
     }
 
     @Test
     public void testTokenizeNestedFunctions() throws ParseException {
         String input = "MEAN((2 + 3))";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(0).type());
-        assertEquals("MEAN", tokens.get(0).name());
-        assertEquals("(2+3)", tokens.get(0).contents());
+        assertEquals(1, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "MEAN", "(2+3)");
     }
 
     @Test
@@ -159,10 +198,7 @@ public class ComplexScannerTest {
         String input = "MEDIAN()";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(1, tokens.size());
-
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(0).type());
-        assertEquals("MEDIAN", tokens.get(0).name());
-        assertEquals("", tokens.get(0).contents());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "MEDIAN", "");
     }
 
     @Test
@@ -171,19 +207,34 @@ public class ComplexScannerTest {
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
         assertEquals(1, tokens.size());
 
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(0).type());
-        assertEquals("MEDIAN", tokens.get(0).name());
-        assertEquals("2,a,MEDIAN(b)", tokens.get(0).contents());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "MEDIAN", "2,a,MEDIAN(b)");
     }
 
     @Test
     public void testTokenizeFunctionWithNestedFunction() throws ParseException {
-        String input = "func1(func2(2 + 3))";
+        String input = "()+";
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
-        assertEquals(1, tokens.size());
-
-        assertEquals(ComplexScanner.TokenType.FUNC, tokens.get(0).type());
-        assertEquals("func1", tokens.get(0).name());
-        assertEquals("func2(2+3)", tokens.get(0).contents());
+        assertEquals(2, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.FUNC, "", "");
+        assertToken(tokens.get(1), ComplexScanner.TokenType.OP, "+", null);
     }
+
+    @Test
+    public void testTokenizeFunctionSymbolAsSpecialChar() throws ParseException {
+        String input = "+SUM(2, 3)";
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        assertEquals(2, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.OP, "+", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.FUNC, "SUM", "2,3");
+    }
+
+    @Test
+    public void testTokenizeNegativeConstantParseException() throws ParseException {
+        String input = "-5";
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        assertEquals(2, tokens.size());
+        assertToken(tokens.get(0), ComplexScanner.TokenType.OP, "-", null);
+        assertToken(tokens.get(1), ComplexScanner.TokenType.CONST, "5", null);
+    }
+
 }
