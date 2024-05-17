@@ -11,6 +11,8 @@ zip submission.zip src/sheep/expression/arithmetic/Mean.java
 zip submission.zip src/sheep/expression/arithmetic/Median.java
 zip submission.zip src/sheep/parsing/ComplexParser.java
 zip submission.zip src/sheep/parsing/*
+zip submission.zip src/sheep/sheets/Sheet.java
+zip submission.zip src/sheep/sheets/SheetBuilder.java
 zip submission.zip src/sheep/ui/graphical/javafx/SheepApplication.java
 zip submission.zip src/sheep/ui/graphical/javafx/*
 

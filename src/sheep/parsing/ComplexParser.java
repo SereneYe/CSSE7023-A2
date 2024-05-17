@@ -8,8 +8,6 @@ import sheep.expression.InvalidExpression;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static sheep.parsing.ComplexScanner.OPERATORS;
-
 /**
  * A parser of Basic, Arithmetic, and broader functional components.
  *
@@ -30,30 +28,31 @@ public class ComplexParser implements Parser {
         this.factory = factory;
     }
 
-    public Expression tryParseComplex(String input) throws ParseException, InvalidExpression {
-        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
-        return parseWithPrecedence(tokens, 0);
+    public Expression[] tryParseComplex(String[] inputs) throws ParseException, InvalidExpression {
+        Expression[] expressions = new Expression[inputs.length];
+        for (int i = 0; i < inputs.length; i++) {
+            expressions[i] = tryParseComplex(inputs[i]);
+        }
+        return expressions;
     }
 
-    public Expression parseWithPrecedence(List<ComplexScanner.Token> tokens, int cur_precedence) throws ParseException, InvalidExpression {
-        if (tokens.isEmpty()) {
+    public Expression tryParseComplex(String input) throws ParseException, InvalidExpression {
+
+        input = input.strip();
+        if (input.isEmpty()) {
             return factory.createEmpty();
         }
-        if (tokens.get(0).type().equals(ComplexScanner.TokenType.OP) && tokens.get(0).name().equals(
-                "-")) {
-            tokens.add(0, new ComplexScanner.Token(ComplexScanner.TokenType.CONST, "0"));
+
+        List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        if (tokens.get(0).name().contains("-")) {
+            String remainingInput = input.substring(1);
+            return factory.createOperator("-",
+                    new Expression[]{factory.createEmpty(), tryParseComplex(remainingInput)});
         }
 
         if (tokens.size() == 1) {
             ComplexScanner.Token token = tokens.get(0);
             if (token.type().equals(ComplexScanner.TokenType.FUNC)) {
-                if (token.contents().isEmpty()) {
-                    return factory.createEmpty();
-                }
-                else if (token.contents().matches("[a-zA-Z]+")) {
-                    // token.contents只包含字母
-                    return factory.createReference(token.contents());
-                }
                 String[] contents = SPLIT_ON_COMMA_OUTSIDE_PARENS.split(token.contents());
                 Object[] parsedContents = new Object[contents.length];
                 for (int i = 0; i < contents.length; i++) {
@@ -68,35 +67,37 @@ public class ComplexParser implements Parser {
                 return factory.createReference(token.name());
             }
         } else if (tokens.size() % 2 == 1) {
-            char operator = OPERATORS.get(cur_precedence);
-            List<Integer> operatorIndices = new ArrayList<>();
             for (int i = 1; i < tokens.size(); i += 2) {
                 ComplexScanner.Token token = tokens.get(i);
-                if (token.type().equals(ComplexScanner.TokenType.OP) && token.name().equals(String.valueOf(operator))) {
-                    operatorIndices.add(i);
-                }
-            }
+                if (Objects.equals(token.type(), ComplexScanner.TokenType.OP)) {
+                    if (token.name().contains(",")) {
+                        return factory.createOperator(",",
+                                tryParseComplex(input.split(",")));
+                    } else if (token.name().contains("=")) {
+                        return factory.createOperator("=",
+                                tryParseComplex(input.split("=")));
+                    } else if (token.name().contains("<")) {
+                        return factory.createOperator("<",
+                                tryParseComplex(input.split("<")));
+                    } else if (token.name().contains("-")) {
+                        return factory.createOperator("-", tryParseComplex(input.split("-")));
 
-            if (!operatorIndices.isEmpty()) {
-                List<Object> parsedTokens = new ArrayList<>();
-                for (int index = 0; index < operatorIndices.size(); index++) {
-                    int startIndex = index == 0 ? 0 : operatorIndices.get(index - 1) + 1;
-                    int endIndex = operatorIndices.get(index);
-                    List<ComplexScanner.Token> subTokens = tokens.subList(startIndex, endIndex);
-                    parsedTokens.add(parseWithPrecedence(new ArrayList<>(subTokens), 0));
+                    } else if (token.name().contains("+")) {
+                        return factory.createOperator("+", tryParseComplex(input.split("\\+")));
+
+                    } else if (token.name().contains("*")) {
+                        return factory.createOperator("*", tryParseComplex(input.split("\\*")));
+
+                    } else if (token.name().contains("/")) {
+                        return factory.createOperator("/", tryParseComplex(input.split("/")));
+                    }
+
                 }
-                parsedTokens.add(parseWithPrecedence(new ArrayList<>(tokens.subList(operatorIndices.get(operatorIndices.size() - 1) + 1, tokens.size())), 0));
-                return factory.createOperator(String.valueOf(operator), parsedTokens.toArray());
             }
-            if (cur_precedence < OPERATORS.size() - 1) {
-                return parseWithPrecedence(tokens, cur_precedence + 1);
-            }
-        } else {
-            throw new ParseException("Invalid expression: Inconsistency between operators and " +
-                    "numbers of tokens");
+        }  else {
+            throw new ParseException("Inconsistent number of operator and variables: " + input);
         }
-
-        return factory.createEmpty();
+        return factory.createReference(input);
     }
 
 
