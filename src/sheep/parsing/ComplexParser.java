@@ -42,13 +42,13 @@ public class ComplexParser implements Parser {
         if (input.isEmpty()) {
             return factory.createEmpty();
         }
-        try {
-            long number = Long.parseLong(input);
-            return factory.createConstant(number);
-        } catch (NumberFormatException ignored) {
-            // ignore unable to parse
-        }
+
         List<ComplexScanner.Token> tokens = ComplexScanner.tokenize(input);
+        if (tokens.get(0).name().contains("-")) {
+            String remainingInput = input.substring(1);
+            return factory.createOperator("-",
+                    new Expression[]{factory.createEmpty(), tryParseComplex(remainingInput)});
+        }
 
         if (tokens.size() == 1) {
             ComplexScanner.Token token = tokens.get(0);
@@ -78,7 +78,7 @@ public class ComplexParser implements Parser {
                                 tryParseComplex(input.split("=")));
                     } else if (token.name().contains("<")) {
                         return factory.createOperator("<",
-                               tryParseComplex(input.split("<")));
+                                tryParseComplex(input.split("<")));
                     } else if (token.name().contains("-")) {
                         return factory.createOperator("-", tryParseComplex(input.split("-")));
 
@@ -94,9 +94,7 @@ public class ComplexParser implements Parser {
 
                 }
             }
-        } else if (tokens.size() % 2 == 0 && tokens.get(0).name().contains("-")) {
-            return tryParseComplex("0"+input.trim());
-        } else {
+        }  else {
             throw new ParseException("Inconsistent number of operator and variables: " + input);
         }
         return factory.createReference(input);
@@ -153,4 +151,3 @@ public class ComplexParser implements Parser {
         }
     }
 }
-
