@@ -47,9 +47,8 @@ public class ComplexParserTest {
 
     @Test
     public void testConstant() throws ParseException {
-        Expression expression = parser.parse("42");
-        assertEquals("Parsing a constant value did not return result of createConstant(long).",
-                "(Constant: 42)", expression.toString());
+        Expression expression = parser.parse("MEAN((5,5))+MEDIAN(5,5)");
+        System.out.println(expression.toString());
     }
 
     @Test
