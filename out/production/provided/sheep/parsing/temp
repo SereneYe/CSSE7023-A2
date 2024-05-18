@@ -60,3 +60,17 @@ public Expression tryParseComplex(String input) throws ParseException, InvalidEx
 
         return factory.createEmpty();
     }
+
+
+
+<(Operator: / [(Operator: MEAN [(Operator: , [(Constant: 1), (Constant: 1), (Constant: 2)])]),
+(Operator: MEDIAN [(Operator: , [(Constant: 1), (Constant: 1), (Constant: 2)])])])>
+
+<(Operator: / [(Operator: MEAN [(Constant: 1), (Constant: 1), (Constant: 2)]),
+(Operator: MEDIAN [(Constant: 1), (Constant: 1), (Constant: 2)])])>
+
+
+
+expected:<(Operator: / [(Operator: MEAN [(Operator: , [(Constant: 1), (Constant: 1), (Constant: 2), (Constant: 3), (Constant: 5), (Constant: 8), (Constant: 13), (Constant: 21), (Constant: 34), (Constant: 55), (Constant: 89), (Constant: 144)])]), (Operator: MEDIAN [(Operator: , [(Constant: 1), (Constant: 1), (Constant: 2), (Constant: 3), (Constant: 5), (Constant: 8), (Constant: 13), (Constant: 21), (Constant: 34), (Constant: 55), (Constant: 89), (Constant: 144)])])])>
+but was:<(Operator: / [(Operator: MEAN [(Constant: 1), (Constant: 1), (Constant: 2), (Constant: 3), (Constant: 5), (Constant: 8), (Constant: 13), (Constant: 21), (Constant: 34), (Constant: 55), (Constant: 89), (Constant: 144)]), (Operator: MEDIAN [(Constant: 1), (Constant: 1), (Constant: 2), (Constant: 3), (Constant: 5), (Constant: 8), (Constant: 13), (Constant: 21), (Constant: 34), (Constant: 55), (Constant: 89), (Constant: 144)])])>
+

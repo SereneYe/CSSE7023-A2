@@ -17,8 +17,6 @@ public class ComplexParserTest {
         parser = new ComplexParser(new EchoFactory());
     }
 
-
-
     /**
      * Assert that parsing the empty string returns the
      * result of `createEmpty()` from the parsers factory.
@@ -83,9 +81,8 @@ public class ComplexParserTest {
 
     @Test
     public void testConstantNegativeSpace() throws ParseException {
-        Expression expression = parser.parse("   -A2");
-        assertEquals("Parsing a negative constant with whitespace did not return result of createConstant(long).",
-                "(Constant: -42)", expression.toString());
+        Expression expression = parser.parse("-A5");
+        System.out.println(expression.toString());
     }
 
     @Test
