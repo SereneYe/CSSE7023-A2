@@ -47,7 +47,7 @@ public class ComplexParserTest {
 
     @Test
     public void testConstant() throws ParseException {
-        Expression expression = parser.parse("MEAN((5,5))+MEDIAN(5,5)");
+        Expression expression = parser.parse("5+5+");
         System.out.println(expression.toString());
     }
 
@@ -78,6 +78,12 @@ public class ComplexParserTest {
         Expression expression = parser.parse("00000");
         assertEquals("Parsing multiple zeros did not return result of createConstant(long).",
                 "(Constant: 0)", expression.toString());
+    }
+
+    @Test
+    public void testConstantStrip() throws ParseException {
+        Expression expression = parser.parse("5*5+5+5+5+5/5/5/5");
+        System.out.println(expression.toString());
     }
 
     @Test

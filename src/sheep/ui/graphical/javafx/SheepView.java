@@ -177,7 +177,7 @@ public class SheepView {
      * @param cellDataGrid The ObservableList of CellData arrays.
      */
     private static void setFirstCol(TableColumn<CellData[], String> column,
-                                     ObservableList<CellData[]> cellDataGrid) {
+                                    ObservableList<CellData[]> cellDataGrid) {
         column.setPrefWidth(Configuration.HEADER_COLUMN_WIDTH);
         column.setCellValueFactory(cellData -> {
             int rowIndex = 0;
@@ -268,6 +268,11 @@ public class SheepView {
 
         ChangeListener<Boolean> focusLostListener;
 
+        private static final String SELECTED_STYLE = "-fx-background-color: " +
+                "#caf0fd;-fx-text-fill: #000; -fx-alignment: CENTER; -fx-font-size: 14px;";
+        private static final String NOT_SELECTED_STYLE = "-fx-background-color: #fff; " +
+                "-fx-text-fill: #000; -fx-alignment: CENTER;; -fx-font-size: 14px;";
+
         /**
          * Constructs a CustomTableCell object with the given TableView and finalColumnIndex.
          *
@@ -290,10 +295,20 @@ public class SheepView {
 
         protected void setOnMouseClickedHandler() {
             setOnMouseClicked(event -> {
-                if (!isEmpty() && event.getClickCount() == 1) {
+                if (!isEmpty() && event.getClickCount() == 2) {
                     startEdit();
                 }
             });
+        }
+
+        @Override
+        public void updateSelected(boolean selected) {
+            super.updateSelected(selected);
+            if(selected) {
+                this.setStyle(SELECTED_STYLE);
+            } else {
+                this.setStyle(NOT_SELECTED_STYLE);
+            }
         }
 
         @Override
@@ -372,7 +387,7 @@ public class SheepView {
                     newValue);
             if (response.isSuccess()) {
                 refreshView();
-               // Set label value to the updated formula
+                // Set label value to the updated formula
                 formulaLabel.setText(Objects.requireNonNullElse(newValue, ""));
             } else {
                 // If update failed, handle the error

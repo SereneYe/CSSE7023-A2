@@ -60,9 +60,10 @@ public class ComplexParser implements Parser {
             return factory.createOperator("-",
                     new Expression[]{factory.createEmpty(), parseWithPrecedence(
                             tokens.subList(1, tokens.size()), 0)});
-        } else if (tokens.size()%2==1){
+        } else if (tokens.size() % 2 == 1) {
             char operator = OPERATORS.get(cur_precedence);
             List<Integer> operatorIndices = new ArrayList<>();
+
             for (int i = 1; i < tokens.size(); i += 2) {
                 ComplexScanner.Token token = tokens.get(i);
                 if (token.type().equals(ComplexScanner.TokenType.OP) &&
@@ -85,8 +86,7 @@ public class ComplexParser implements Parser {
             if (cur_precedence < OPERATORS.size() - 1) {
                 return parseWithPrecedence(tokens, cur_precedence + 1);
             }
-        }
-        else {
+        } else {
             throw new ParseException("Invalid expression: Inconsistency between operators and " +
                     "numbers of tokens");
         }

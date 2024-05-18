@@ -14,12 +14,13 @@ public class Median extends Function {
         if (arguments.length == 0) {
             throw new IllegalArgumentException("No arguments provided");
         }
-        Arrays.sort(arguments);
+        long[] sortedArguments = Arrays.copyOf(arguments, arguments.length);
+        Arrays.sort(sortedArguments);
 
-        if (arguments.length % 2 == 0) {
-            return (arguments[arguments.length / 2 - 1] + arguments[arguments.length / 2]) / 2;
+        if (sortedArguments.length % 2 == 0) {
+            return (sortedArguments[sortedArguments.length / 2 - 1] + sortedArguments[sortedArguments.length / 2]) / 2;
         } else {
-            return arguments[arguments.length / 2];
+            return sortedArguments[sortedArguments.length / 2];
         }
     }
 }
