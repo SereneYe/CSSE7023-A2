@@ -47,7 +47,7 @@ public class ComplexParserTest {
 
     @Test
     public void testConstant() throws ParseException {
-        Expression expression = parser.parse("5+5+");
+        Expression expression = parser.parse("55-5*5-5*5");
         System.out.println(expression.toString());
     }
 
@@ -82,7 +82,7 @@ public class ComplexParserTest {
 
     @Test
     public void testConstantStrip() throws ParseException {
-        Expression expression = parser.parse("5*5+5+5+5+5/5/5/5");
+        Expression expression = parser.parse("MEAN((1,2,3))/MEDIAN(2,3,4)");
         System.out.println(expression.toString());
     }
 
