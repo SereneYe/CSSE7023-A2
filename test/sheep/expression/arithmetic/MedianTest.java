@@ -18,12 +18,14 @@ public class MedianTest {
     public void testIdentityPerform() throws TypeError {
         Function arith = new Median(new Expression[]{new Constant(20)});
         long result = arith.perform(new long[]{20});
-        assertEquals("Result of performing minus with a single Constant is incorrect.", 20, result);
+        assertEquals("Result of performing minus with a single Constant is incorrect.",
+                20, result);
     }
 
     @Test
     public void testTwoValue() throws TypeError {
-        Function arith = new Median(new Expression[]{new Constant(20), new Constant(11)});
+        Function arith = new Median(new Expression[]{new Constant(20),
+                new Constant(11)});
         Expression result = arith.value(new HashMap<>());
         assertTrue("Result of evaluating minus is not a constant.",
                 result instanceof Constant);
@@ -35,7 +37,8 @@ public class MedianTest {
     @Test
     public void testNValue() throws TypeError {
         Function arith = new Median(
-                new Expression[]{new Constant(20), new Constant(2), new Constant(2), new Constant(2)}
+                new Expression[]{new Constant(20), new Constant(2),
+                        new Constant(2), new Constant(2)}
         );
         Expression result = arith.value(new HashMap<>());
         assertTrue("Result of evaluating minus is not a constant.",
@@ -47,7 +50,8 @@ public class MedianTest {
     @Test
     public void testTriPerform() throws TypeError {
         Function arith = new Median(
-                new Expression[]{new Constant(20), new Constant(10), new Constant(11),
+                new Expression[]{new Constant(20), new Constant(10),
+                        new Constant(11),
                         new Constant(1),
                        }
         );
@@ -59,11 +63,13 @@ public class MedianTest {
     @Test
     public void testNPerform() throws TypeError {
         Function arith = new Median(
-                new Expression[]{new Constant(20), new Constant(10), new Constant(2),
+                new Expression[]{new Constant(20), new Constant(10),
+                        new Constant(2),
                         new Constant(2)}
         );
         long result = arith.perform(new long[]{20, 10, 2, 2});
-        assertEquals("Result of performing minus with multiple Constants is incorrect",6, result);
+        assertEquals("Result of performing minus with multiple Constants is incorrect",
+                6, result);
     }
 
 
@@ -77,7 +83,8 @@ public class MedianTest {
 
     @Test
     public void testMultipleNegativeNumbers() throws TypeError {
-        Function arith = new Median(new Expression[]{new Constant(-10), new Constant(-5),
+        Function arith = new Median(new Expression[]{new Constant(-10),
+                new Constant(-5),
                 new Constant(-6)});
         long result = arith.perform(new long[]{-10,-5,-6});
         assertEquals("Result of Minus with a single negative number is incorrect.",
@@ -86,7 +93,8 @@ public class MedianTest {
 
     @Test
     public void testTriNegativeNumbers() throws TypeError {
-        Function arith = new Median(new Expression[]{new Constant(-10), new Constant(-5)});
+        Function arith = new Median(new Expression[]{new Constant(-10),
+                new Constant(-5)});
         long result = arith.perform(new long[]{-10, -5});
         assertEquals("Result of Minus with a single negative number is incorrect.",
                 -7, result);
@@ -94,7 +102,8 @@ public class MedianTest {
 
     @Test
     public void testMultipleIdenticalNumbers() throws TypeError {
-        Function arith = new Median(new Expression[]{new Constant(5), new Constant(5), new Constant(5)});
+        Function arith = new Median(new Expression[]{new Constant(5),
+                new Constant(5), new Constant(5)});
         long result = arith.perform(new long[]{5,5,5});
         assertEquals("Result of Minus with a single negative number is incorrect.",
                 5, result);
@@ -102,23 +111,25 @@ public class MedianTest {
 
     @Test
     public void testMultipleIdenticalNegativeNumbers() throws TypeError {
-        Function arith = new Median(new Expression[]{new Constant(-5), new Constant(-5),
+        Function arith = new Median(new Expression[]{new Constant(-5),
+                new Constant(-5),
                 new Constant(-5)});
         long result = arith.perform(new long[]{-5,-5,-5});
         assertEquals("Result of Minus with a single negative number is incorrect.",
                 -5, result);
     }
 
-    @Test(expected = Exception.class) // Update Exception.class to your specific exception: e.g, InvalidArgumentException.class
+    @Test(expected = Exception.class)
     public void testEmptyInput() throws TypeError {
         Function arith = new Median(new Expression[]{});
         long result = arith.perform(new long[]{});
         fail("Expected an exception to be thrown");
     }
 
-    @Test // Update Exception.class to your specific exception: e.g, InvalidArgumentException.class
+    @Test
     public void testOperatorInput() throws TypeError {
-        Function arith = new Median(new Expression[]{new Plus(new Expression[]{new Constant(1)})});
+        Function arith = new Median(new Expression[]{new Plus(new Expression[]{
+                new Constant(1)})});
         long result = arith.perform(new long[]{1});
         assertEquals("Result of Minus with a single negative number is incorrect.",
                 1, result);
